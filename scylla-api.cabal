@@ -1,0 +1,68 @@
+name:                scylla-api
+version:             0.1.0.0
+synopsis:            API for Scylla CI
+description:         Scylla API implementation
+homepage:            https://github.com/ci-realm/scylla-api
+license:             BSD3
+license-file:        LICENSE
+author:              Richard Marko
+maintainer:          srk@48.io
+copyright:           2018 Richard Marko
+category:            Testing
+build-type:          Simple
+cabal-version:       >=1.20
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     Scylla.Client
+                     , Scylla.Client.Websocket
+                     , Scylla.Pretty
+  build-depends:       base >= 4.7 && < 5
+                     , aeson
+                     , ansi-wl-pprint
+                     , split
+                     , time
+                     , binary
+                     , bytestring
+                     , containers
+                     , data-default
+                     , mtl
+                     , stm
+                     , scylla
+                     , network
+                     , websockets
+                     , wuss
+                     , text
+  default-language:    Haskell2010
+
+executable scylla-api
+  hs-source-dirs:      app
+  main-is:             Main.hs
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , bytestring
+                     , containers
+                     , data-default
+                     , stm
+                     , mtl
+                     , aeson
+                     , text
+                     , scylla
+                     , scylla-api
+  default-language:    Haskell2010
+
+
+-- test-suite scylla-api-tests
+--   type:                exitcode-stdio-1.0
+--   hs-source-dirs:      test
+--   main-is:             Spec.hs
+--   other-modules:       SpecHelper
+--   build-depends:       base >= 4.7 && < 5
+--                      , scylla-api
+--                      , hspec
+--                      , base16-bytestring
+--   default-language:    Haskell2010
+
+source-repository head
+   type:     git
+   location: https://github.com/ci-realm/scylla-api
