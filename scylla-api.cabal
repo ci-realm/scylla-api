@@ -15,6 +15,8 @@ cabal-version:       >=1.20
 library
   hs-source-dirs:      src
   exposed-modules:     Scylla.Client
+                     , Scylla.Client.Config
+                     , Scylla.Client.Types
                      , Scylla.Client.Websocket
                      , Scylla.Pretty
   build-depends:       base >= 4.7 && < 5
@@ -25,7 +27,11 @@ library
                      , binary
                      , bytestring
                      , containers
+                     , filepath
+                     , directory
+                     , config-ini
                      , data-default
+                     , pretty-relative-time
                      , mtl
                      , stm
                      , scylla
@@ -47,6 +53,7 @@ executable scylla-api
                      , mtl
                      , aeson
                      , text
+                     , optparse-applicative
                      , scylla
                      , scylla-api
   default-language:    Haskell2010

@@ -1,50 +1,43 @@
 {-# LANGUAGE OverloadedStrings #-}
 
---import Control.Concurrent
---import Control.Concurrent.STM
 import Control.Monad.IO.Class
 
+import Options.Applicative
+import Data.Semigroup ((<>))
+
 import Scylla.Client
--- TMP
 import Scylla.Client.Websocket
 import qualified Scylla.Types.API as A
-
 import Scylla.Pretty
 
-main = runScylla
+main = do
+  p <- execParser opts
+  ppCfg <- ppConfRelative
 
-main' = withScylla "ci.48.io" 443 $ do
-  query $ A.queryBuild 12
-  --x <- recv
-  --case x of
-  --  Right (A.RBuild b) -> liftIO . putStrLn $ ppBuild b
+  withScylla $ do
+    query p
+    x <- recv
+    case x of
+      Right (A.RBuild x)     -> liftIO . putStrLn $ ppBuild ppCfg x
+      Right (A.RBuilds x)    -> liftIO . putStrLn $ ppBuilds ppCfg x
+      Right (A.ROrgBuilds x) -> liftIO . putStrLn $ ppBuilds ppCfg x
+      Right (A.ROrgs x)      -> liftIO . putStrLn $ ppOrgs ppCfg x
+      Right  A.RRestart      -> liftIO . putStrLn $ "Restarted"
+      Left err               -> liftIO . fail $ "Error: " ++ err
 
-  --query $ A.queryRestart 17
+opts = info (cmdParser <**> helper)
+  (fullDesc
+  <> progDesc "scylla-api"
+  <> header "scylla API client")
 
+parseBuild = A.queryBuild <$> (argument auto (metavar "ID"))
+parseRestart = A.queryRestart <$> (argument auto (metavar "ID"))
+parseOrgBuilds = A.queryOrganizationBuilds <$> (argument str (metavar "ORGNAME"))
 
-{-
- - for primitive api
- -
-lastBuilds' :: Scylla [B.Build]
-lastBuilds' = do
-  q <- apiQuery $ Query LastBuilds Nothing
-  case q of
-    Right (RBuilds bs) -> return bs
-    _ -> fail "Expected builds"
-
-
-build' :: String -> Integer -> Scylla B.Build
-build' proj id = do
-  q <- apiQuery $ Query Build $ Just $ M.fromList [("id", show id), ("projectName", proj)]
-  case q of
-    Right (RBuild b) -> return b
-    _ -> fail "Expected build"
-
--- request/response wrapper
-apiQuery q = do
-  conn <- ask
-  liftIO $ sendTextData conn $ encode q
-  message <- liftIO $ receiveData conn
-  liftIO $ print message
-  return $ (eitherDecode message :: Either String Response)
--}
+cmdParser = subparser
+  (  command "lastBuilds" (info (pure A.queryLastBuilds) (progDesc "Query last builds"))
+  <> command "build" (info parseBuild (progDesc "Query build"))
+  <> command "organizations" (info (pure A.queryOrganizations) (progDesc "Query organizations"))
+  <> command "organizationBuilds" (info parseOrgBuilds (progDesc "Query organization builds"))
+  <> command "restart" (info parseRestart (progDesc "Restart builds"))
+  )
