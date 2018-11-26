@@ -12,7 +12,7 @@ Usage
 # copy and edit provided sample
 cp scylla-api.conf ~/.scylla-api.conf
 
-nix-build
+nix build
 ./result/bin/scylla-api lastBuilds
 
 # use --help to list all available commands
