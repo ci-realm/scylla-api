@@ -6,8 +6,8 @@ mkDerivation {
   version = "0.1.0.0";
   src = fetchgit {
     url = "https://github.com/ci-realm/data-scylla.git";
-    sha256 = "1w1xxzvrx2cjnz300d48qsarag552pq84r2mbm00k17y27km9ncd";
-    rev = "7db0ad3222a422c5490934235a4572ea26e46c2f";
+    sha256 = "0yp3wr0g8hfvlbx49w4jrmd01k3a9c7v2bcp9mip8dhbvghywh9i";
+    rev = "679e088684fdd8b5e5e0c71f50a24693a8cf5080";
     fetchSubmodules = true;
   };
   libraryHaskellDepends = [
