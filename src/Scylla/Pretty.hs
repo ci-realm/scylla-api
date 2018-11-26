@@ -70,13 +70,14 @@ ppBuild' PPConf{..} B.Build{..} =
   (statusColor status (string $ printf "%5d %8s" id (show status)))
   <+> (yellow $ string $ timeRenderer createdAt)
   <+> (bold $ green $ string projectName)
-  <+> (ppFinished status finishedAt createdAt)
+  <+> (cyan $ string $ "Duration" ++ (ppFinished status finishedAt createdAt))
   <>  (maybe empty (\x -> hardline <> ppLog' x) log)
-  where
-    ppFinished BS.Success end start = ppDiff end start
-    ppFinished BS.Failure end start = ppDiff end start
-    ppFinished _ _ _ = empty
-    ppDiff end start = cyan $ string $ "Duration: " ++ (ppHumanDiff $ round (diffUTCTime (zonedTimeToUTC end) (zonedTimeToUTC start)))
+
+ppFinished BS.Success end start = ppDiff end start
+ppFinished BS.Failure end start = ppDiff end start
+ppFinished _ _ _ = ""
+
+ppDiff end start = (ppHumanDiff $ round (diffUTCTime (zonedTimeToUTC end) (zonedTimeToUTC start)))
 
 ppHumanDiff x | x > 3600 = (show $ x `div` 3600) ++ "h " ++ (ppHumanDiff $ x `mod` 3600)
 ppHumanDiff x | x > 60 = (show $ x `div` 60) ++ "m " ++ (ppHumanDiff $ x `mod` 60)
